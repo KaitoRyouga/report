@@ -2,7 +2,7 @@ import { Button, Grid, TextField } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 import React, { useState, useEffect } from 'react'
 import Cookies from 'universal-cookie';
-import { Redirect } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 
 import axios from 'axios'
 
@@ -10,8 +10,7 @@ const cookies = new Cookies();
 
 const Login = () => {
 
-    const [login, setlogin] = useState(false)
-
+    let history = useHistory();
     const [user, setuser] = useState({
         username: "",
         password: ""
@@ -46,14 +45,12 @@ const Login = () => {
             let res = await axios.post(`${process.env.REACT_APP_API}/login`, user)
             res = res.data
 
-            console.log(res)
-
             if (res.status) {
                 setcheck(true)
                 setmessage(res)
 
                 cookies.set('jwt', res.body.data.jwt)
-                setlogin(true)
+                history.push("/")
 
             } else {
                 setcheck(true)
@@ -78,7 +75,7 @@ const Login = () => {
                     res = res.data
 
                     if (res.status) {
-                        setlogin(true)
+                        history.push("/")
                     }
                 }
             } catch (error) {
@@ -88,14 +85,10 @@ const Login = () => {
 
         check()
 
-    }, [jwt])
+    }, [jwt, history])
 
     return (
         <Grid spacing={5} direction="row" justify="center" alignItems="center" style={{ marginTop: '1em' }} container>
-
-            {
-                login && <Redirect to="/" />
-            }
 
             <Grid item xs={8}>
                 <TextField onKeyPress={onHandleLoginWithEnter} onChange={e => setuser({ ...user, username: e.target.value })} label="Username"></TextField>

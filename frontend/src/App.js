@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -12,12 +12,12 @@ import './styles/App.css'
 
 // router
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
-    Link,
-    Redirect
+    Link
 } from "react-router-dom";
+
+import { useHistory } from "react-router-dom";
 
 import Cookies from 'universal-cookie';
 
@@ -42,66 +42,59 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
 
-    const [logout, setlogout] = useState(false)
+    let history = useHistory();
     const classes = useStyles();
 
     return (
         <div className="App">
-            <Router>
+            <div>
+                <div className={classes.root}>
+                    <AppBar position="static">
+                        <Toolbar>
+                            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                                <MenuIcon />
+                            </IconButton>
+                            <Typography variant="h6" className={classes.title}>
+                                Report
+                            </Typography>
+                            <Button color="inherit">
+                                <Link className="link" to="/">
+                                    <p>Home</p>
+                                </Link>
+                            </Button>
+                            <Button color="inherit">
+                                <Link className="link" to="/login">
+                                    <p>Login</p>
+                                </Link>
+                            </Button>
+                            <Button color="inherit">
+                                <Link className="link" to="/info">
+                                    <p>Info</p>
+                                </Link>
+                            </Button>
+                            <Button onClick={() => {
+                                cookies.remove("jwt")
+                                history.push("/login");
+                            }} color="inherit">
+                                Logout
+                            </Button>
 
-                {
-                    logout && <Redirect to="/login" />
-                }
-
-                <div>
-                    <div className={classes.root}>
-                        <AppBar position="static">
-                            <Toolbar>
-                                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                                    <MenuIcon />
-                                </IconButton>
-                                <Typography variant="h6" className={classes.title}>
-                                    Report
-                                </Typography>
-                                <Button color="inherit">
-                                    <Link className="link" to="/">
-                                        <p>Home</p>
-                                    </Link>
-                                </Button>
-                                <Button color="inherit">
-                                    <Link className="link" to="/login">
-                                        <p>Login</p>
-                                    </Link>
-                                </Button>
-                                <Button color="inherit">
-                                    <Link className="link" to="/info">
-                                        <p>Info</p>
-                                    </Link>
-                                </Button>
-                                <Button onClick={() => {
-                                    cookies.remove("jwt")
-                                    setlogout(true)
-                                }} color="inherit">
-                                    Logout
-                                </Button>
-
-                            </Toolbar>
-                        </AppBar>
-                    </div>
-
-                    <Switch>
-                        <Route exact path="/">
-                            <Home />
-                        </Route>
-                        <Route path="/login">
-                            <Login />
-                        </Route>
-                        <Route path="/info">
-                            <Info />
-                        </Route>
-                    </Switch>
+                        </Toolbar>
+                    </AppBar>
                 </div>
-            </Router>
+
+                <Switch>
+                    <Route exact path="/">
+                        <Home />
+                    </Route>
+                    <Route path="/login">
+                        <Login />
+                    </Route>
+                    <Route path="/info">
+                        <Info />
+                    </Route>
+                </Switch>
+            </div>
         </div>
     );
 }

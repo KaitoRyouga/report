@@ -10,7 +10,7 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import DateFnsUtils from "@date-io/date-fns";
-import { Redirect } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
 import Cookies from 'universal-cookie';
 import axios from 'axios';
 
@@ -78,7 +78,7 @@ const columns = [
 
 const Home = () => {
 
-    const [login, setlogin] = useState(false)
+    let history = useHistory();
     const [open, setOpen] = useState(false)
     const [onDelete, setOnDelete] = useState(false)
     const [rate, setRate] = useState("")
@@ -221,7 +221,7 @@ const Home = () => {
                 res = res.data
 
                 if (!res.status) {
-                    setlogin(true)
+                    history.push("/login")
                 }else{
                     if(res.body.data.task[0] !== ""){
                         setList(res.body.data.task)
@@ -229,13 +229,13 @@ const Home = () => {
                     
                 }
             } else {
-                setlogin(true)
+                history.push("/login")
             }
         }
 
         check()
 
-    }, [jwt])
+    }, [jwt, history])
 
     const update = async (data) => {
 
@@ -345,10 +345,6 @@ const Home = () => {
 
     return (
         <Grid direction="row" justify="flex-start" alignItems="center" container spacing={3}>
-
-            {
-                login && <Redirect to="/login" />
-            }
 
             <Grid item style={{ marginTop: '1em', marginLeft: '1em' }}>
                 <Button variant="contained" color="secondary" onClick={onHandleOpen}>

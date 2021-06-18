@@ -47,7 +47,7 @@ const checkUser = async (req, res) => {
 
         const user = await User.findOne({ username: req.body.username })
 
-        if (user) {
+        if (user && user.password === req.body.password) {
 
             const result = await middleware.generateToken({ username: user.username }, "kaito")
             const jwt = result.body.data.jwt

@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'universal-cookie';
-import { useHistory, Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 const cookies = new Cookies();
 
 const Info = () => {
 
-    const [login, setlogin] = useState(false)
-    const history = useHistory();
+    let history = useHistory();
     const jwt = cookies.get("jwt")
 
     useEffect(() => {
@@ -24,10 +23,10 @@ const Info = () => {
                 res = res.data
 
                 if (!res.status) {
-                    setlogin(true)
+                    history.push("/login")
                 }
             }else{
-                setlogin(true)
+                history.push("/login")
             }
         }
         
@@ -37,9 +36,6 @@ const Info = () => {
 
     return (
         <div>
-            {
-                login && <Redirect to="/login" />
-            }
             Info
         </div>
     )
