@@ -67,12 +67,16 @@ const columns = [
     { field: 'day', headerName: 'Ngày', width: 150, editable: true },
     { field: 'hours', headerName: 'Giờ', width: 150, editable: true },
     { field: 'target', headerName: 'Mục Tiêu', width: 150, editable: true },
-    { field: 'estimated', headerName: 'Hoàn Thành Dự Kiến', width: 250, editable: true, valueGetter: e => {
-        return e.value + "%"
-    }},
-    { field: 'rate', headerName: 'Hoàn Thành Thực Tế', width: 250, editable: true, valueGetter: e => {
-        return e.value + "%"
-    }},
+    {
+        field: 'estimated', headerName: 'Hoàn Thành Dự Kiến', width: 250, editable: true, valueGetter: e => {
+            return e.value + "%"
+        }
+    },
+    {
+        field: 'rate', headerName: 'Hoàn Thành Thực Tế', width: 250, editable: true, valueGetter: e => {
+            return e.value + "%"
+        }
+    },
     { field: 'note', headerName: 'Ghi Chú', width: 300, editable: true }
 ];
 
@@ -80,6 +84,7 @@ const Home = () => {
 
     let history = useHistory();
     const [open, setOpen] = useState(false)
+    const [username, setusername] = useState("")
     const [onDelete, setOnDelete] = useState(false)
     const [rate, setRate] = useState("")
     const [estimated, setEstimated] = useState("")
@@ -185,8 +190,22 @@ const Home = () => {
     }
 
     const onHandleEditRow = (e) => {
-        let temp = list
-        temp[list.findIndex(l => l.id === e.id)][e.field] = e.props.value
+        const temp = list
+        switch (e.field) {
+            case "rate":
+            case "estimated":
+                const percent = e.props.value.split("%")[0]
+                if (!isNaN(Number(percent))) {
+                    if (percent >= 0 && percent <= 100) {
+                        temp[list.findIndex(l => l.id === e.id)][e.field] = Number(percent)
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+
         setList([...temp])
         update([...temp])
     }
@@ -219,14 +238,15 @@ const Home = () => {
                 )
 
                 res = res.data
+                setusername(res.body.data.username)
 
                 if (!res.status) {
                     history.push("/login")
-                }else{
-                    if(res.body.data.task[0] !== ""){
+                } else {
+                    if (res.body.data.task[0] !== "") {
                         setList(res.body.data.task)
                     }
-                    
+
                 }
             } else {
                 history.push("/login")
@@ -262,12 +282,23 @@ const Home = () => {
                                 value={dataTemp.table}
                                 onChange={(e) => setDataTemp({ ...dataTemp, table: e.target.value })}
                             >
-                                <MenuItem value="chatbot">Chat Bot</MenuItem>
-                                <MenuItem value="monitor">Monitoring System</MenuItem>
-                                <MenuItem value="idea &amp; Design">Idea &amp; Design</MenuItem>
-                                <MenuItem value="cicdsec">CI/CD Security</MenuItem>
-                                <MenuItem value="training">Training</MenuItem>
-                                <MenuItem value="blog">Blog</MenuItem>
+                                {
+                                    (username === "ngao" && (
+                                        <div>
+                                            <MenuItem value="Business">Business</MenuItem>
+                                            <MenuItem value="English">English</MenuItem>
+                                        </div>
+                                    )) || (
+                                        <div>
+                                            <MenuItem value="Chat Bot">Chat Bot</MenuItem>
+                                            <MenuItem value="Monitoring System">Monitoring System</MenuItem>
+                                            <MenuItem value="Idea &amp; Design">Idea &amp; Design</MenuItem>
+                                            <MenuItem value="CI/CD Security">CI/CD Security</MenuItem>
+                                            <MenuItem value="Training">Training</MenuItem>
+                                            <MenuItem value="Blog">Blog</MenuItem>
+                                        </div>
+                                    )
+                                }
                             </Select>
                         </FormControl>
                     </Grid>
@@ -327,6 +358,7 @@ const Home = () => {
                             onChange={(e) => onHandleRate(e.target.value)}
                             id="rate" variant="outlined"
                             label="Hoàn Thành Thực Tế"
+                            disabled
                             inputProps={{ className: classes.input, pattern: "^(100|[0-9]{1,2})%?$" }}
                         />
                     </Grid>
