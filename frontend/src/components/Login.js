@@ -3,6 +3,7 @@ import { Alert } from '@material-ui/lab'
 import React, { useState, useEffect } from 'react'
 import Cookies from 'universal-cookie';
 import { useHistory } from "react-router-dom";
+import config from '../data/config';
 
 import axios from 'axios'
 
@@ -42,7 +43,11 @@ const Login = () => {
 
             // call api
 
-            let res = await axios.post(`${process.env.REACT_APP_API}/login`, user)
+            console.log(config.REACT_APP_API)
+
+            console.log(`${config.REACT_APP_API}/login`)
+
+            let res = await axios.post(`${config.REACT_APP_API}/login`, user)
             res = res.data
 
             if (res.status) {
@@ -66,7 +71,7 @@ const Login = () => {
             try {
                 if (jwt !== undefined) {
 
-                    let res = await axios.get(`${process.env.REACT_APP_API}/info`, {
+                    let res = await axios.get(`${config.REACT_APP_API}/info`, {
                         headers: {
                             Authorization: `Bearer ${jwt}`
                         }

@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'universal-cookie';
 import { useHistory } from 'react-router-dom';
+import config from '../data/config';
+
 const cookies = new Cookies();
 
 const Info = () => {
@@ -14,7 +16,7 @@ const Info = () => {
         const check = async () => {
             
             if (jwt !== undefined && jwt !== "" && jwt !== null) {
-                let res = await axios.get(`${process.env.REACT_APP_API}/info`,
+                let res = await axios.get(`${config.REACT_APP_API}/info`,
                     {
                         headers: { 'Authorization': `Bearer ${jwt}` }
                     }

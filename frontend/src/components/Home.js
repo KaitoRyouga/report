@@ -13,6 +13,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import { useHistory } from "react-router-dom";
 import Cookies from 'universal-cookie';
 import axios from 'axios';
+import config from '../data/config';
 
 const cookies = new Cookies();
 
@@ -203,6 +204,7 @@ const Home = () => {
                 break;
 
             default:
+                temp[list.findIndex(l => l.id === e.id)][e.field] = e.props.value
                 break;
         }
 
@@ -231,7 +233,7 @@ const Home = () => {
         const check = async () => {
 
             if (jwt !== undefined && jwt !== "" && jwt !== null) {
-                let res = await axios.get(`${process.env.REACT_APP_API}/info`,
+                let res = await axios.get(`${config.REACT_APP_API}/info`,
                     {
                         headers: { 'Authorization': `Bearer ${jwt}` }
                     }
@@ -259,7 +261,9 @@ const Home = () => {
 
     const update = async (data) => {
 
-        await axios.post(`${process.env.REACT_APP_API}/task`, data,
+        console.log(data)
+
+        await axios.post(`${config.REACT_APP_API}/task`, data,
             {
                 headers: { 'Authorization': `Bearer ${jwt}` },
             }
@@ -276,30 +280,35 @@ const Home = () => {
                     <Grid item xs={12}>
                         <FormControl className={classes.formControl}>
                             <InputLabel id="demo-simple-select-label">Tên Bảng</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={dataTemp.table}
-                                onChange={(e) => setDataTemp({ ...dataTemp, table: e.target.value })}
-                            >
-                                {
-                                    (username === "ngao" && (
-                                        <div>
-                                            <MenuItem value="Business">Business</MenuItem>
-                                            <MenuItem value="English">English</MenuItem>
-                                        </div>
-                                    )) || (
-                                        <div>
-                                            <MenuItem value="Chat Bot">Chat Bot</MenuItem>
-                                            <MenuItem value="Monitoring System">Monitoring System</MenuItem>
-                                            <MenuItem value="Idea &amp; Design">Idea &amp; Design</MenuItem>
-                                            <MenuItem value="CI/CD Security">CI/CD Security</MenuItem>
-                                            <MenuItem value="Training">Training</MenuItem>
-                                            <MenuItem value="Blog">Blog</MenuItem>
-                                        </div>
-                                    )
-                                }
-                            </Select>
+
+                            {
+                                (username === "ngao" && (
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={dataTemp.table}
+                                        onChange={(e) => setDataTemp({ ...dataTemp, table: e.target.value })}
+                                    >
+                                        <MenuItem value="Business">Business</MenuItem>
+                                        <MenuItem value="English">English</MenuItem>
+                                    </Select>
+                                )) || (
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={dataTemp.table}
+                                        onChange={(e) => setDataTemp({ ...dataTemp, table: e.target.value })}
+                                    >
+                                        <MenuItem value="Chat Bot">Chat Bot</MenuItem>
+                                        <MenuItem value="Monitoring System">Monitoring System</MenuItem>
+                                        <MenuItem value="Idea &amp; Design">Idea &amp; Design</MenuItem>
+                                        <MenuItem value="CI/CD Security">CI/CD Security</MenuItem>
+                                        <MenuItem value="Training">Training</MenuItem>
+                                        <MenuItem value="Blog">Blog</MenuItem>
+                                    </Select>
+                                )
+                            }
+
                         </FormControl>
                     </Grid>
                     <Grid item xs={12}>
