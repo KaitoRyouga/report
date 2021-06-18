@@ -61,7 +61,7 @@ function App() {
                                     <MenuIcon />
                                 </IconButton>
                                 <Typography variant="h6" className={classes.title}>
-                                    News
+                                    Report
                                 </Typography>
                                 <Button color="inherit">
                                     <Link className="link" to="/">
