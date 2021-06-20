@@ -1,98 +1,118 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 
-// import css
-import './styles/App.css'
-
-// router
-import {
-    Switch,
-    Route,
-    Link
-} from "react-router-dom";
-
-import { useHistory } from "react-router-dom";
+import axios from 'axios';
 
 import Cookies from 'universal-cookie';
 
-// import components
-import Home from './components/Home'
-import Login from './components/Login'
-import Info from './components/Info'
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+import {
+    Switch,
+    Route,
+    useHistory
+} from "react-router-dom";
+
+import config from './data/config';
+
+const Login = lazy(() => import('./components/Login'));
+const Home = lazy(() => import('./components/Home'));
+const Info = lazy(() => import('./components/Info'));
+const Admin = lazy(() => import('./components/Admin'));
+const AppToolBar = lazy(() => import('./childComponents/AppToolBar'));
 
 const cookies = new Cookies();
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
-    },
-    menuButton: {
-        marginRight: theme.spacing(2),
-    },
-    title: {
-        flexGrow: 1,
-    },
-}));
+const Load = () => {
+    return (
+        <CircularProgress color="secondary" />
+    )
+}
 
 function App() {
 
-    let history = useHistory();
-    const classes = useStyles();
+    console.log("App")
+
+    const history = useHistory();
+    const [login, setlogin] = useState(false)
+    const [data, setdata] = useState({
+        username: "",
+        task: []
+    })
+
+    const jwt = cookies.get("jwt")
+
+    useEffect(() => {
+
+        const check = async () => {
+
+            if (jwt !== undefined && jwt !== "" && jwt !== null) {
+
+                let res = await axios.get(`${config.REACT_APP_API}/info`,
+                    {
+                        headers: { 'Authorization': `Bearer ${jwt}` }
+                    }
+                )
+
+                res = res.data
+
+                if (!res.status) {
+                    history.push("/login")
+                } else {
+
+                    if (res.body.data.task[0] !== "") {
+
+                        setdata({
+                            username: res.body.data.username,
+                            task: res.body.data.task
+                        })
+
+                    }
+
+                }
+
+            } else {
+                history.push("/login")
+            }
+        }
+
+        check()
+
+    }, [jwt, history, login])
 
     return (
         <div className="App">
+
+            <Suspense fallback={<Load />}>
+                <AppToolBar login={login} username={data.username} setlogin={setlogin} />
+            </Suspense>
+
             <div>
-                <div className={classes.root}>
-                    <AppBar position="static">
-                        <Toolbar>
-                            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                                <MenuIcon />
-                            </IconButton>
-                            <Typography variant="h6" className={classes.title}>
-                                Report
-                            </Typography>
-                            <Button color="inherit">
-                                <Link className="link" to="/">
-                                    <p>Home</p>
-                                </Link>
-                            </Button>
-                            <Button color="inherit">
-                                <Link className="link" to="/login">
-                                    <p>Login</p>
-                                </Link>
-                            </Button>
-                            <Button color="inherit">
-                                <Link className="link" to="/info">
-                                    <p>Info</p>
-                                </Link>
-                            </Button>
-                            <Button onClick={() => {
-                                cookies.remove("jwt")
-                                history.push("/login");
-                            }} color="inherit">
-                                Logout
-                            </Button>
-
-                        </Toolbar>
-                    </AppBar>
-                </div>
-
                 <Switch>
+
                     <Route exact path="/">
-                        <Home />
+                        <Suspense fallback={<Load />}>
+                            <Home list={data.task} username={data.username} setList={e => setdata({ ...data, task: e })} />
+                        </Suspense>
                     </Route>
+
                     <Route path="/login">
-                        <Login />
+                        <Suspense fallback={<Load />}>
+                            <Login setlogin={setlogin} />
+                        </Suspense>
                     </Route>
+
                     <Route path="/info">
-                        <Info />
+                        <Suspense fallback={<Load />}>
+                            <Info username={data.username} />
+                        </Suspense>
                     </Route>
+
+                    <Route path="/admin">
+                        <Suspense fallback={<Load />}>
+                            <Admin username={data.username} />
+                        </Suspense>
+                    </Route>
+
                 </Switch>
             </div>
         </div>

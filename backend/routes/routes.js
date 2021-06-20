@@ -1,5 +1,6 @@
 const userController = require('../controllers/userController')
 const taskController = require('../controllers/taskController')
+const adminController = require('../controllers/adminController')
 const middleware = require('../middleware/methods')
 
 module.exports = (app) => {
@@ -18,5 +19,8 @@ module.exports = (app) => {
 
     app.route('/task')
         .post(taskController.addTask)
+
+    app.route('/admin')
+        .get(adminController.index)
 
 }

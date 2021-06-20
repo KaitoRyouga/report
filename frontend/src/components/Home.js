@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Button, TextField, Modal, Grid } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles';
 import { DataGrid } from '@material-ui/data-grid';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { FormControl, MenuItem, Select, InputLabel } from '@material-ui/core';
@@ -10,86 +9,24 @@ import {
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import DateFnsUtils from "@date-io/date-fns";
-import { useHistory } from "react-router-dom";
 import Cookies from 'universal-cookie';
 import axios from 'axios';
+
 import config from '../data/config';
+import columnTable from '../data/column';
+
+import useStyles from '../styles/Home';
 
 const cookies = new Cookies();
 
-const useStyles = makeStyles((theme) => ({
-    paper: {
-        position: 'absolute',
-        width: 400,
-        backgroundColor: theme.palette.background.paper,
-        border: '2px solid #000',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-    },
-    err: {
-        position: 'absolute',
-        width: 400,
-        height: 400,
-        backgroundColor: theme.palette.background.paper,
-        border: '2px solid #000',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-    },
-    input: {
-        "&:invalid": {
-            border: "red solid 2px"
-        }
-    },
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 200,
-    },
-}));
+const Home = ({ list, username, setList }) => {
 
-const getModalStyle = () => {
-    const top = 50;
-    const left = 50;
-
-    return {
-        top: `${top}%`,
-        left: `${left}%`,
-        transform: `translate(-${top}%, -${left}%)`,
-        position: 'absolute',
-        overflow: 'scroll',
-        height: '100%',
-        display: 'block'
-    };
-}
-
-const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'table', headerName: 'Tên Bảng', width: 150, editable: true },
-    { field: 'task', headerName: 'Tên Task', width: 150, editable: true },
-    { field: 'day', headerName: 'Ngày', width: 150, editable: true },
-    { field: 'hours', headerName: 'Giờ', width: 150, editable: true },
-    { field: 'target', headerName: 'Mục Tiêu', width: 150, editable: true },
-    {
-        field: 'estimated', headerName: 'Hoàn Thành Dự Kiến', width: 250, editable: true, valueGetter: e => {
-            return e.value + "%"
-        }
-    },
-    {
-        field: 'rate', headerName: 'Hoàn Thành Thực Tế', width: 250, editable: true, valueGetter: e => {
-            return e.value + "%"
-        }
-    },
-    { field: 'note', headerName: 'Ghi Chú', width: 300, editable: true }
-];
-
-const Home = () => {
-
-    let history = useHistory();
+    console.log("Home")
+    
     const [open, setOpen] = useState(false)
-    const [username, setusername] = useState("")
     const [onDelete, setOnDelete] = useState(false)
     const [rate, setRate] = useState("")
     const [estimated, setEstimated] = useState("")
-    const [list, setList] = useState([])
     const [deletedRows, setDeletedRows] = useState([]);
     const [dataTemp, setDataTemp] = useState({
         table: "",
@@ -106,7 +43,6 @@ const Home = () => {
     const [selectedTime, setSelectedTime] = useState(new Date());
 
     const classes = useStyles();
-    const [modalStyle] = useState(getModalStyle);
 
     const onHandleOpen = () => {
         setOpen(true)
@@ -131,20 +67,21 @@ const Home = () => {
             dataTemp.hours = hours + ':' + minutes
         }
 
-        if (dataTemp.table === "" || dataTemp.task === "" || dataTemp.target === "" || dataTemp.note === "" || dataTemp.estimated === 0) {
-            // setErr(true)
-        } else {
-            const count = list.length
-            dataTemp.id = count + 1
+        if (dataTemp.table !== "" || dataTemp.task !== "" || dataTemp.target !== "" || dataTemp.note !== "" || dataTemp.estimated !== 0) {
+
+            dataTemp.id = list.length + 1
             setList([...list, dataTemp])
             update([...list, dataTemp])
             onHandleClose()
+
         }
     }
 
     const handleDayChange = (date) => {
+
         setSelectedDay(date);
         setDataTemp({ ...dataTemp, day: new Intl.DateTimeFormat('UTC', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date) })
+
     };
 
     const handleTimeChange = (date) => {
@@ -179,15 +116,14 @@ const Home = () => {
 
     }
 
-    const handleRowSelectionAll = (e) => {
+    const onHandleRowSelection = (e) => {
 
-        const check = e.selectionModel
-
-        if (check.length !== 0) {
-            setDeletedRows(check)
+        if (e.selectionModel.length !== 0) {
+            setDeletedRows(e.selectionModel)
         } else {
             setOnDelete(false)
         }
+
     }
 
     const onHandleEditRow = (e) => {
@@ -228,37 +164,6 @@ const Home = () => {
 
     const jwt = cookies.get("jwt")
 
-    useEffect(() => {
-
-        const check = async () => {
-
-            if (jwt !== undefined && jwt !== "" && jwt !== null) {
-                let res = await axios.get(`${config.REACT_APP_API}/info`,
-                    {
-                        headers: { 'Authorization': `Bearer ${jwt}` }
-                    }
-                )
-
-                res = res.data
-                setusername(res.body.data.username)
-
-                if (!res.status) {
-                    history.push("/login")
-                } else {
-                    if (res.body.data.task[0] !== "") {
-                        setList(res.body.data.task)
-                    }
-
-                }
-            } else {
-                history.push("/login")
-            }
-        }
-
-        check()
-
-    }, [jwt, history])
-
     const update = async (data) => {
 
         console.log(data)
@@ -272,7 +177,7 @@ const Home = () => {
     }
 
     const body = (
-        <div style={modalStyle} className={classes.paper}>
+        <div className={classes.paper}>
 
             <h2 id="simple-modal-title">Thêm task</h2>
             <div id="simple-modal-description">
@@ -385,9 +290,9 @@ const Home = () => {
     )
 
     return (
-        <Grid direction="row" justify="flex-start" alignItems="center" container spacing={3}>
+        <Grid justify="flex-start" alignItems="center" container spacing={3}>
 
-            <Grid item style={{ marginTop: '1em', marginLeft: '1em' }}>
+            <Grid className="gridHome" item>
                 <Button variant="contained" color="secondary" onClick={onHandleOpen}>
                     Thêm task
                 </Button>
@@ -400,26 +305,27 @@ const Home = () => {
                 }
             </Grid>
 
-            <Modal
-                open={open}
-                onClose={onHandleClose}
-            // aria-labelledby="simple-modal-title"
-            // aria-describedby="simple-modal-description"
-            >
-                {body}
-            </Modal>
-
             <Grid item xs={12}>
                 <div style={{ height: 400, width: '100%' }}>
                     <DataGrid
                         rows={list}
-                        columns={columns}
-                        pageSize={5} checkboxSelection
+                        columns={columnTable}
+                        pageSize={5} 
+                        checkboxSelection
                         onEditCellChangeCommitted={onHandleEditRow}
-                        onSelectionModelChange={handleRowSelectionAll}
+                        onSelectionModelChange={onHandleRowSelection}
                     />
                 </div>
             </Grid>
+
+            <Modal
+                open={open}
+                onClose={onHandleClose}
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+            >
+                {body}
+            </Modal>
 
         </Grid>
     )

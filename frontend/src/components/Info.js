@@ -1,44 +1,13 @@
-import React, { useEffect } from 'react'
-import axios from 'axios'
-import Cookies from 'universal-cookie';
-import { useHistory } from 'react-router-dom';
-import config from '../data/config';
+import React from 'react'
 
-const cookies = new Cookies();
+const Info = ({ username }) => {
 
-const Info = () => {
-
-    let history = useHistory();
-    const jwt = cookies.get("jwt")
-
-    useEffect(() => {
-
-        const check = async () => {
-            
-            if (jwt !== undefined && jwt !== "" && jwt !== null) {
-                let res = await axios.get(`${config.REACT_APP_API}/info`,
-                    {
-                        headers: { 'Authorization': `Bearer ${jwt}` }
-                    }
-                )
-
-                res = res.data
-
-                if (!res.status) {
-                    history.push("/login")
-                }
-            }else{
-                history.push("/login")
-            }
-        }
-        
-        check()
-
-    }, [jwt, history])
+    console.log("Info")
+    console.log(username)
 
     return (
         <div>
-            Info
+            {username}
         </div>
     )
 }

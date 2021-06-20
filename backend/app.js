@@ -16,9 +16,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json())
 
-console.log("process.env.DB_PASS: ", process.env.DB_PASS)
-console.log(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster-learn.ysvwg.mongodb.net/${process.env.DB_NAME}`)
-
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster-learn.ysvwg.mongodb.net/${process.env.DB_NAME}`, {useNewUrlParser: true, useUnifiedTopology: true});
 
 routes(app)

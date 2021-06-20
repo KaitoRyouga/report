@@ -28,6 +28,21 @@ services:
         networks:
             service_network:
 
+    tuvan:
+        restart: always
+        image: kaitoryouga/tuvan:latest
+        expose:
+            - 9090
+        environment:
+            HTTP_PORT: 9090
+            VIRTUAL_HOST: devf.tech
+            LETSENCRYPT_HOST: devf.tech
+            LETSENCRYPT_EMAIL: "kmactfweb@gmail.com"
+        networks:
+            service_network:
+        command: /bin/bash
+        tty: true
+
     watchtower:
         image: containrrr/watchtower
         volumes:
