@@ -17,12 +17,34 @@ import columnTable from '../data/column';
 
 import useStyles from '../styles/Home';
 
+import {
+    useParams
+} from "react-router-dom";
+
 const cookies = new Cookies();
 
-const Home = ({ list, username, setList }) => {
+const Home = ({ list, username, setList, admin }) => {
+
+    let { userId } = useParams();
+    const [user, setuser] = useState([])
 
     console.log("Home")
-    
+    // console.log(admin)
+
+    useEffect(() => {
+
+        console.log("admin: ", admin)
+
+        if (admin.status) {
+            const temp = admin.data.user.filter(a => a._id == userId)[0].task
+            temp.map((t, id) => {
+                t.id = id
+            })
+            setuser(temp)
+            console.log(temp)
+        }
+    }, [user, admin])
+
     const [open, setOpen] = useState(false)
     const [onDelete, setOnDelete] = useState(false)
     const [rate, setRate] = useState("")
@@ -308,9 +330,9 @@ const Home = ({ list, username, setList }) => {
             <Grid item xs={12}>
                 <div style={{ height: 400, width: '100%' }}>
                     <DataGrid
-                        rows={list}
+                        rows={admin.status ? user : list}
                         columns={columnTable}
-                        pageSize={5} 
+                        pageSize={5}
                         checkboxSelection
                         onEditCellChangeCommitted={onHandleEditRow}
                         onSelectionModelChange={onHandleRowSelection}

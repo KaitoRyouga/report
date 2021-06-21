@@ -34,6 +34,12 @@ function App() {
 
     const history = useHistory();
     const [login, setlogin] = useState(false)
+    const [admin, setadmin] = useState({
+        status: false,
+        data: {
+            user: []
+        }
+    })
     const [data, setdata] = useState({
         username: "",
         task: []
@@ -66,6 +72,8 @@ function App() {
                             task: res.body.data.task
                         })
 
+                        setlogin(true)
+
                     }
 
                 }
@@ -91,7 +99,7 @@ function App() {
 
                     <Route exact path="/">
                         <Suspense fallback={<Load />}>
-                            <Home list={data.task} username={data.username} setList={e => setdata({ ...data, task: e })} />
+                            <Home list={data.task} username={data.username} setList={e => setdata({ ...data, task: e })} admin={admin} />
                         </Suspense>
                     </Route>
 
@@ -109,7 +117,13 @@ function App() {
 
                     <Route path="/admin">
                         <Suspense fallback={<Load />}>
-                            <Admin username={data.username} />
+                            <Admin setadmin={setadmin} />
+                        </Suspense>
+                    </Route>
+
+                    <Route path="/adminview/:userId">
+                        <Suspense fallback={<Load />}>
+                            <Home list={data.task} username={data.username} setList={e => setdata({ ...data, task: e })} admin={admin} />
                         </Suspense>
                     </Route>
 

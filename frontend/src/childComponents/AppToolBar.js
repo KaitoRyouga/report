@@ -22,6 +22,8 @@ const cookies = new Cookies();
 
 const AppToolBar = ({ login, username, setlogin }) => {
 
+    console.log(login)
+
     const history = useHistory()
     const classes = useStyles();
 
