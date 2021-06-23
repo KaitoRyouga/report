@@ -11764,6 +11764,9 @@ h5,
 .ftco-section {
      padding: 7em 0;
      background-image: url('./image/bg.webp');
+     background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center; 
 
 }
 
