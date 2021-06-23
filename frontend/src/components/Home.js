@@ -190,11 +190,11 @@ const Home = ({ list, username, setList, admin }) => {
 
         console.log(data)
 
-        await axios.post(`${config.REACT_APP_API}/task`, data,
-            {
-                headers: { 'Authorization': `Bearer ${jwt}` },
-            }
-        )
+        // await axios.post(`${config.REACT_APP_API}/task`, data,
+        //     {
+        //         headers: { 'Authorization': `Bearer ${jwt}` },
+        //     }
+        // )
 
     }
 

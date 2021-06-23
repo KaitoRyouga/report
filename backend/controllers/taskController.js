@@ -19,19 +19,23 @@ const addTask = async (req, res) => {
 
         if (user) {
 
-            dataTask.map((d, id) => {
-                dataTask[id].id = id
-            })
+            if (user.username === "kaito") {
 
-            const temp = {
-                username: user.username,
-                password: user.password,
-                _id: user._id,
-                task: dataTask
+            } else {
+                dataTask.map((d, id) => {
+                    dataTask[id].id = id
+                })
+
+                const temp = {
+                    username: user.username,
+                    password: user.password,
+                    _id: user._id,
+                    task: dataTask
+                }
+
+                await User.updateOne({ username: user.username }, temp)
+                res.json(models.response(true, 'Update success!'))
             }
-
-            await User.updateOne({username: user.username}, temp)
-            res.json(models.response(true, 'Update success!'))
 
         } else {
             res.json(models.response(false, 'token invalid!'))
